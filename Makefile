@@ -36,6 +36,9 @@ uninstall:
 clean:
 	$(RM) ${BIN} ${OBJ} ${DEP} ${BINTAR}
 
+debug: ASFLAGS += -g
+debug: ${BIN}
+
 -include ${DEP}
 
-.PHONY: dist install uninstall clean
+.PHONY: dist install uninstall clean debug

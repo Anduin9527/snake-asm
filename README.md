@@ -1,29 +1,7 @@
 # snake-asm
 
-I wanted to learn some assembly language, so I made this tiny snake game for x86_64 Linux using [NASM](https://www.nasm.us/).
+## 参考资料
+[Searchable Linux Syscall Table for x86 and x86_64 | PyTux](https://filippo.io/linux-syscall-table/)
 
-![showcase](images/showcase.gif)
-
-## Download binary
-
-You can download a compiled version of the game from the [releases page](https://github.com/NikitaIvanovV/snake-asm/releases/latest).
-
-## Compile and install
-
-*NOTE: [NASM](https://www.nasm.us/) is required in order to compile the game.*
-
-```sh
-git clone https://github.com/NikitaIvanovV/snake-asm
-cd snake-asm
-sudo make install
-```
-
-Uninstall with `sudo make uninstall`
-
-## Package manager
-
-If you are an Arch Linux user, you can install [`snake-asm`](https://aur.archlinux.org/packages/snake-asm/) AUR package:
-
-```sh
-yay -S snake-asm
-```
+[Linux System Call Table for x86 64](https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/)
+### 系统调用

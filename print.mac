@@ -10,4 +10,3 @@ extern newline_len
 
 %endif
 
-; vim:ft=nasm

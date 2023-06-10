@@ -9,6 +9,7 @@ extern ioctl
 extern exit
 extern poll
 extern write
-
+extern exec
+extern fork
 %endif
 

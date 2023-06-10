@@ -6,6 +6,8 @@
 %define POLL      7  ; 函数原型：int poll(struct pollfd *fds, nfds_t nfds, int timeout);
 %define IOCTL     16 ; 函数原型：int ioctl(int fd, unsigned long request, ...);
 %define NANOSLEEP 35 ; 函数原型：int nanosleep(const struct timespec *req, struct timespec *rem);
+%define EXEC      59 ; 函数原型：int execve(const char *filename, char *const argv[], char *const envp[]);
+%define FORK      57 ; 函数原型：pid_t fork(void);
 %define EXIT      60 ; 函数原型：void exit(int status);
 
 ; rax: syscall number
@@ -190,6 +192,40 @@ read:
 		pop rdi
 		ret
 
+global exec
+; 函数名: exec
+; 参数:
+;   - rax: 可执行文件路径字符串指针filename（以0结尾）
+;   - rdx: filename, arg1, arg2...,（以0结尾）
+; 注意：
+;   - rdx 的值为指针数组，类型为 dq ，每个元素都是字符串指针，以0结尾
+; 用于执行命令
+exec:
+	push rdi
+	push rsi
+
+	mov rsi, rdx ; 将参数字符串指针存储到 rsi 寄存器中
+	mov rdi, rax ; 将可执行文件路径字符串指针存储到 rdi 寄存器中
+	mov rdx, 0   ; 将环境变量指针存储到 rdx 寄存器中
+
+	SYS EXEC     ; 调用系统调用函数 EXEC
+
+	pop rsi
+	pop rdi
+	ret
+global fork 
+; 函数名: fork
+; 返回值: 
+;   - rax: 如果当前进程是父进程，返回子进程的 PID
+;          如果当前进程是子进程，返回值为 0
+;          如果创建子进程失败，返回值小于 0
+; 用于创建子进程
+fork:
+	SYS FORK     ; 调用系统调用函数 FORK
+	ret
+
+
+; 用于执行命令
 section .data
 
 DEF_STR_DATA text_syscall_err, "System call failed!", 10

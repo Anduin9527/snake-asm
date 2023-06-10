@@ -94,9 +94,10 @@ section .text
 
 global poll
 
-
-; rax: buffer
-; rdx: count
+; 函数名：poll
+; 参数：
+; - rax: buffer
+; - rdx: count
 ; 用于轮询事件 
 poll:
     push rdi

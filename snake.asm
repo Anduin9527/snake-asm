@@ -2,7 +2,7 @@
 %include "syscall.mac"
 
 %define MAIN _start
-
+; 定义基本参数
 %define MOVE_EVERY_TICK   2           ; 移动间隔(帧)
 %define SIZE_X            21          ; 地图宽度
 %define SIZE_Y            21					; 地图高度

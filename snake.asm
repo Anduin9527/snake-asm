@@ -121,7 +121,7 @@ arg4  db 'alsa',0
 arg5  db 'repeat',0
 arg6  db '2',0
 argv  dq play,arg1,music,arg3,arg4,arg5,arg6,0
-argv2 dq play,arg1,coin,arg3,arg4,arg5,arg6,0
+argv2 dq play,arg1,coin,arg3,arg4,0
 child_pid dq 0 ;child process PID
 section .bss
 
@@ -449,10 +449,16 @@ update_state:
 	.grow:
 		inc qword [eaten]
 		inc qword [score]
+		call place_apple            ; 放置新苹果
+		;创建子进程播放coin音效
+		call fork
+		cmp rax,0
+		jne .exit
+		mov rax,play
+		mov rdx,argv2
+		call exec
 		
-		call place_apple
-		jmp .exit
-
+		; jmp .exit
 	.exit:
 		ret
 ; 函数名：update

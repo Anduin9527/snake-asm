@@ -111,6 +111,10 @@ move_dir db DIR_RIGHT						; 蛇移动方向
 
 future_move_dir db DIR_RIGHT		; 蛇下一帧移动方向
 
+; 音乐相关变量
+play db '/bin/usr/play',0
+arg1 db '-q music.mp3 repeat 10',0
+argv dq play, arg1, 0
 section .bss
 
 map_free_buf resq SIZE_N 				; 定义地图空闲单元格缓冲区大小
@@ -120,6 +124,7 @@ PRINT_BUFFER print_buf					; 定义打印缓冲区大小
 print_buf_len resq 1						; 定义打印元素缓冲区大小
 
 snake_cells_buf resq SIZE_N 		; 定义地图蛇身单元格缓冲区大小
+
 
 section .text
 
@@ -564,9 +569,21 @@ shutdown:
 
 ; 入口点
 MAIN:
+	; 创建子进程
+	call fork
+	cmp rax, 0
+	je .child
+.parent:
+	; 父进程运行游戏
 	call init
 	call draw_map
 	call run
 	call shutdown
 	mov rax, 0
 	call exit
+.child:
+	; 子进程播放音乐
+	mov rax, play 
+	mov rdx, argv 
+	call exec
+

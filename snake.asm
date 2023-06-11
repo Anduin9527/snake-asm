@@ -446,6 +446,7 @@ update_state:
 	UPDATE_STATE die, MAP_WALL
 	UPDATE_STATE die, MAP_BODY
 	UPDATE_STATE grow, MAP_APPLE
+	UPDATE_STATE free, MAP_FREE
 	jmp .exit
 
 	.die:

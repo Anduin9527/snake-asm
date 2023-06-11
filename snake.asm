@@ -452,11 +452,10 @@ update_state:
 		mov byte [status], STATUS_DIE
 		jmp .exit
 	.free:
-		call place_apple
-		cmp [isfun],1								; 判断是否开启了fun模式
-		jne .exit
-		call place_apple
-		jmp .exit
+		cmp byte [isfun],1    ; 判断是否开启了狂欢模式
+		jne .exit						  ; 如果没有开启狂欢模式，直接退出
+		call place_apple   		; 放置新苹果
+		jmp .exit            
 	.grow:
 		inc qword [eaten]
 		inc qword [score]

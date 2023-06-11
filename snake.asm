@@ -112,14 +112,16 @@ move_dir db DIR_RIGHT						; 蛇移动方向
 future_move_dir db DIR_RIGHT		; 蛇下一帧移动方向
 
 ; 音乐相关变量
-play db '/usr/bin/play',0
-arg1 db '-q',0
-arg2 db 'music.mp3',0
-arg3 db '-t',0
-arg4 db 'alsa',0
-arg5 db 'repeat',0
-arg6 db '2',0
-argv dq play,arg1,arg2,arg3,arg4,arg5,arg6,0
+play  db '/usr/bin/play',0
+arg1  db '-q',0
+music db './res/music.mp3',0
+coin  db './res/coin.mp3',0
+arg3  db '-t',0
+arg4  db 'alsa',0
+arg5  db 'repeat',0
+arg6  db '2',0
+argv  dq play,arg1,music,arg3,arg4,arg5,arg6,0
+argv2 dq play,arg1,coin,arg3,arg4,arg5,arg6,0
 child_pid dq 0 ;child process PID
 section .bss
 
@@ -447,6 +449,7 @@ update_state:
 	.grow:
 		inc qword [eaten]
 		inc qword [score]
+		
 		call place_apple
 		jmp .exit
 

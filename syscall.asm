@@ -1,5 +1,5 @@
 %include "print.mac"
-%include "syscall_int.mac"
+%include "syscall.inc"
 
 %define READ      0  ; 函数原型：ssize_t read(int fd, void *buf, size_t count);
 %define WRITE     1  ; 函数原型：ssize_t write(int fd, const void *buf, size_t count);

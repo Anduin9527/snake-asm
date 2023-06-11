@@ -1,5 +1,5 @@
-%ifndef PRINT_INT_MAC 
-%define PRINT_INT_MAC 
+%ifndef PRINT_INC 
+%define PRINT_INC
 ;宏定义字符串
 %macro DEF_STR_DATA 2+ 
 	%1 db %2 				; name db value

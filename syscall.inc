@@ -1,5 +1,5 @@
-%ifndef SYSCALL_INT_MAC
-%define SYSCALL_INT_MAC
+%ifndef SYSCALL_INC
+%define SYSCALL_INC
 
 %define STDIN  0
 %define STDOUT 1

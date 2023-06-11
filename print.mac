@@ -1,7 +1,7 @@
 %ifndef PRINT_MAC
 %define PRINT_MAC
 
-%include "print_int.mac"
+%include "print.inc"
 
 extern print
 extern print_num

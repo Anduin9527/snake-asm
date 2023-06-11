@@ -1,7 +1,7 @@
 %ifndef SYSCALL_MAC
 %define SYSCALL_MAC
 
-%include "syscall_int.mac"
+%include "syscall.inc"
 
 extern ioctl
 extern sleep

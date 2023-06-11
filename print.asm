@@ -1,4 +1,4 @@
-%include "print_int.mac" 
+%include "print.inc" 
 %include "syscall.mac" 
 
 section .data

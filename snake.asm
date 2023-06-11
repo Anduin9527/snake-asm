@@ -34,6 +34,7 @@
 %define KEY_S   115
 %define KEY_D   100
 %define KEY_ESC 27
+%define KEY_Q   113
 
 %define CELL_TEXT '  ' 							; 地图单元格样式
 %strlen CELL_TEXT_LEN CELL_TEXT     ; 地图单元格长度
@@ -89,7 +90,7 @@ DEF_COLOR_SEQ miku,'36','46'                 ; 青色
 
 ; 字符串设置
 DEF_STR_DATA text_score, "当前分数: "
-DEF_STR_DATA text_controls, "使用 WSAD 移动，使用 ESC 退出游戏", 10
+DEF_STR_DATA text_controls, "WSAD 移动，ESC 退出游戏，Q 进入狂欢模式", 10
 DEF_STR_DATA text_game_over, "GAME OVER!", 10
 DEF_STR_DATA cell_sym, CELL_TEXT ; 定义地图元素文本的字符串变量
 
@@ -100,6 +101,7 @@ MAP_BUFFER map									; 使用宏定义定义地图map
 
 length dq 1										  ; 蛇长度
 score dq 0                      ; 分数
+isfun db 0                      ; 是否进入狂欢模式
 eaten dq EATEN_APPLES_INIT      ; 吃掉的苹果数(身体长度)
 snake_x dq SNAKE_X_INIT         ; 蛇头位置X
 snake_y dq SNAKE_Y_INIT         ; 蛇头位置Y
@@ -170,6 +172,7 @@ handle_key:
 	HANDLE_KEY down,  KEY_S
 	HANDLE_KEY left,  KEY_A
 	HANDLE_KEY up,    KEY_W
+	HANDLE_KEY fun,   KEY_Q
 
 	jmp .exit
 
@@ -200,6 +203,12 @@ handle_key:
 		je .exit
 		mov byte [future_move_dir], DIR_UP
 		jmp .exit
+
+	.fun:
+		;切换狂欢模式
+		xor byte [isfun], 1
+		jmp .exit
+
 
 	.exit:
 		ret
@@ -437,13 +446,15 @@ update_state:
 	UPDATE_STATE die, MAP_WALL
 	UPDATE_STATE die, MAP_BODY
 	UPDATE_STATE grow, MAP_APPLE
-	; UPDATE_STATE free, MAP_FREE ;狂欢模式
 	jmp .exit
 
 	.die:
 		mov byte [status], STATUS_DIE
 		jmp .exit
 	.free:
+		call place_apple
+		cmp [isfun],1								; 判断是否开启了fun模式
+		jne .exit
 		call place_apple
 		jmp .exit
 	.grow:

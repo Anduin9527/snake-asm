@@ -28,6 +28,7 @@
 %define STATUS_RUN  0
 %define STATUS_EXIT 1
 %define STATUS_DIE  2
+%define STATUS_FUN  3
 ; 定义按键
 %define KEY_W   119
 %define KEY_A   97
@@ -101,7 +102,6 @@ MAP_BUFFER map									; 使用宏定义定义地图map
 
 length dq 1										  ; 蛇长度
 score dq 0                      ; 分数
-isfun db 0                      ; 是否进入狂欢模式
 eaten dq EATEN_APPLES_INIT      ; 吃掉的苹果数(身体长度)
 snake_x dq SNAKE_X_INIT         ; 蛇头位置X
 snake_y dq SNAKE_Y_INIT         ; 蛇头位置Y
@@ -205,8 +205,8 @@ handle_key:
 		jmp .exit
 
 	.fun:
-		;切换狂欢模式
-		xor byte [isfun], 1
+		;设置游戏状态为狂欢模式
+		mov byte [status], STATUS_FUN
 		jmp .exit
 
 
@@ -452,9 +452,9 @@ update_state:
 		mov byte [status], STATUS_DIE
 		jmp .exit
 	.free:
-		cmp byte [isfun],1    ; 判断是否开启了狂欢模式
+		cmp byte [status], STATUS_FUN
 		jne .exit						  ; 如果没有开启狂欢模式，直接退出
-		call place_apple   		; 放置新苹果
+		call place_apple   		; 否则放置新苹果
 		jmp .exit            
 	.grow:
 		inc qword [eaten]

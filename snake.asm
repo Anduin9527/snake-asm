@@ -112,9 +112,15 @@ move_dir db DIR_RIGHT						; 蛇移动方向
 future_move_dir db DIR_RIGHT		; 蛇下一帧移动方向
 
 ; 音乐相关变量
-play db '/bin/usr/play',0
-arg1 db '-q music.mp3 repeat 10',0
-argv dq play, arg1, 0
+play db '/usr/bin/play',0
+arg1 db '-q',0
+arg2 db 'music.mp3',0
+arg3 db '-t',0
+arg4 db 'alsa',0
+arg5 db 'repeat',0
+arg6 db '2',0
+argv dq play,arg1,arg2,arg3,arg4,arg5,arg6,0
+child_pid dq 0 ;child process PID
 section .bss
 
 map_free_buf resq SIZE_N 				; 定义地图空闲单元格缓冲区大小
@@ -575,10 +581,13 @@ MAIN:
 	je .child
 .parent:
 	; 父进程运行游戏
+	mov [child_pid],rax ; store d
 	call init
 	call draw_map
 	call run
 	call shutdown
+	mov rax, [child_pid]
+	call kill
 	mov rax, 0
 	call exit
 .child:

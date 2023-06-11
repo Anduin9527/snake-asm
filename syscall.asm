@@ -9,6 +9,7 @@
 %define EXEC      59 ; 函数原型：int execve(const char *filename, char *const argv[], char *const envp[]);
 %define FORK      57 ; 函数原型：pid_t fork(void);
 %define EXIT      60 ; 函数原型：void exit(int status);
+%define KILL      62 ; 函数原型：int kill(pid_t pid, int sig);
 
 ; rax: syscall number
 ; 封装系统调用syscall
@@ -222,6 +223,16 @@ global fork
 ; 用于创建子进程
 fork:
 	SYS FORK     ; 调用系统调用函数 FORK
+	ret
+global kill
+; 函数名: kill
+; 参数:
+;   - rax: 要终止的进程的 PID
+; 用于终止进程
+kill:
+	mov rdi, rax 
+	mov rsi, 9 ; SIGKILL
+	SYS KILL   ; 调用系统调用函数 KILL
 	ret
 
 

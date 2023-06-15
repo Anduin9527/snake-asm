@@ -125,6 +125,7 @@ coin  db './res/coin.mp3',0
 golden_coin db './res/1-up.mp3',0
 power_up db './res/power-up.mp3',0
 power_up_appears db './res/power-up-appears.mp3',0
+life_lost db './res/life-lost.mp3',0
 arg3  db '-t',0
 arg4  db 'alsa',0
 arg5  db 'repeat',0
@@ -134,6 +135,7 @@ argv2 dq play,arg1,coin,arg3,arg4,0
 argv_golden dq play,arg1,golden_coin,arg3,arg4,0 
 argv_power_up dq play,arg1,power_up,arg3,arg4,0
 argv_power_up_appears dq play,arg1,power_up_appears,arg3,arg4,0
+argv_life_lost dq play,arg1,life_lost,arg3,arg4,0
 child_pid dq 0 ;child process PID
 section .bss
 
@@ -638,6 +640,10 @@ run:
 
 	.die:
 		PRINT_STR_DATA text_game_over		  ; 打印游戏结束的提示信息
+		; 播放失败音乐
+		mov rax, play
+		mov rdx, argv_life_lost
+		call exec
 
 	.exit:
 		pop rbx						

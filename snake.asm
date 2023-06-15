@@ -640,10 +640,6 @@ run:
 
 	.die:
 		PRINT_STR_DATA text_game_over		  ; 打印游戏结束的提示信息
-		; 播放失败音乐
-		mov rax, play
-		mov rdx, argv_life_lost
-		call exec
 
 	.exit:
 		pop rbx						
@@ -694,6 +690,10 @@ MAIN:
 	mov rax, [child_pid]
 	call kill
 	mov rax, 0
+	; 播放失败音乐
+	mov rax, play
+	mov rdx, argv_life_lost
+	call exec
 	call exit
 .child:
 	; 子进程播放音乐

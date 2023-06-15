@@ -7,7 +7,7 @@ DEF_STR_DATA newline, 10 ; 换行符ASCII 码（10）
 
 section .bss 
 
-print_num_buf resb 8 ; 打印数字的缓冲区
+print_num_buf resb 8    ; 打印数字的缓冲区
 print_num_buf_end equ $ ; 表示缓冲区末尾
 
 section .text 

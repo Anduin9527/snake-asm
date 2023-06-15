@@ -4,6 +4,7 @@
 %define MAIN _start
 ; 定义基本参数
 %define MOVE_EVERY_TICK   2           ; 移动间隔(帧)
+%define MOVE_SPEED_TICK   1           ; 加速间隔(帧)
 %define SIZE_X            21          ; 地图宽度
 %define SIZE_Y            21					; 地图高度
 %define EATEN_APPLES_INIT 3						; 初始苹果数量(蛇身长度)
@@ -36,6 +37,7 @@
 %define KEY_D   100
 %define KEY_ESC 27
 %define KEY_Q   113
+%define KEY_C   99
 
 %define CELL_TEXT '  ' 							; 地图单元格样式
 %strlen CELL_TEXT_LEN CELL_TEXT     ; 地图单元格长度
@@ -91,7 +93,7 @@ DEF_COLOR_SEQ miku,'36','46'                 ; 青色
 
 ; 字符串设置
 DEF_STR_DATA text_score, "当前分数: "
-DEF_STR_DATA text_controls, "WSAD 移动，ESC 退出游戏，Q 进入狂欢模式", 10
+DEF_STR_DATA text_controls, "WSAD 移动，ESC 退出游戏", 10,"Q 进入狂欢模式, C 进入加速模式"
 DEF_STR_DATA text_game_over, "GAME OVER!", 10
 DEF_STR_DATA cell_sym, CELL_TEXT ; 定义地图元素文本的字符串变量
 
@@ -112,6 +114,7 @@ frame dq 0                      ; 当前帧
 move_dir db DIR_RIGHT						; 蛇移动方向
 
 future_move_dir db DIR_RIGHT		; 蛇下一帧移动方向
+is_speed_up db 0                ; 是否开启加速
 
 ; 音乐相关变量
 play  db '/usr/bin/play',0
@@ -173,6 +176,7 @@ handle_key:
 	HANDLE_KEY left,  KEY_A
 	HANDLE_KEY up,    KEY_W
 	HANDLE_KEY fun,   KEY_Q
+	HANDLE_KEY speed, KEY_C
 
 	jmp .exit
 
@@ -208,6 +212,18 @@ handle_key:
 		;设置游戏状态为狂欢模式
 		mov byte [status], STATUS_FUN
 		jmp .exit
+	
+	.speed:
+		; 设置游戏状态为加速模式
+		; 如果当前游戏状态为加速模式则关闭加速模式
+		cmp byte [is_speed_up], 0
+		je .speed_up
+		mov byte [is_speed_up], 0
+		jmp .exit
+		.speed_up:
+			mov byte [is_speed_up], 1
+		jmp .exit
+
 
 
 	.exit:
@@ -438,7 +454,7 @@ update_map_snake:
 ; 函数名：update_state
 ; 参数：
 ; - rax：地图索引
-; 更新游戏状态
+; 更新游戏状态，判断到了何种单元格
 update_state:
 	mov dl, [map+rax] ; 获取地图单元格类型
 
@@ -529,7 +545,7 @@ run:
 
 	.loop:
 		mov rax, input				; 获取输入的缓冲区
-		mov rdx, 1					  ; 设置输入长度为1
+		mov rdx, 1					  
 		
 		call poll					    ; 调用poll函数获取用户输入
 
@@ -541,8 +557,16 @@ run:
 		cmp byte [status], STATUS_DIE		  ; 判断是否为死亡
 		je .die						              
 
+		;如果开启加速模式，则每次循环都更新游戏状态
+		cmp byte [is_speed_up], 0
+		je .normal_speed
+		cmp rbx, MOVE_SPEED_TICK					; 判断是否达到加速模式的移动间隔
+		je .update
+		.normal_speed:
 		cmp rbx, MOVE_EVERY_TICK			    ; 判断是否达到规定的移动间隔
-		je .update					              
+		je .update
+
+							              
 
 		inc rbx						                ; rbx++
 

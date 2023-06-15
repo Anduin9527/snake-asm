@@ -25,6 +25,7 @@
 %define MAP_HEAD  2
 %define MAP_BODY  3
 %define MAP_APPLE 4
+%define MAP_GOLD	5
 ; 定义游戏状态
 %define STATUS_RUN  0
 %define STATUS_EXIT 1
@@ -93,7 +94,7 @@ DEF_COLOR_SEQ miku,'36','46'                 ; 青色
 
 ; 字符串设置
 DEF_STR_DATA text_score, "当前分数: "
-DEF_STR_DATA text_controls, "WSAD 移动，ESC 退出游戏", 10,"Q 进入狂欢模式, C 进入加速模式"
+DEF_STR_DATA text_controls, "WSAD 移动，ESC 退出游戏", 10,"Q 进入狂欢模式, C 进入加速模式",10
 DEF_STR_DATA text_game_over, "GAME OVER!", 10
 DEF_STR_DATA cell_sym, CELL_TEXT ; 定义地图元素文本的字符串变量
 
@@ -298,6 +299,7 @@ draw_cell:
 	DRAW_CELL head,	MAP_HEAD
 	DRAW_CELL body,	MAP_BODY
 	DRAW_CELL apple, MAP_APPLE
+	DRAW_CELL gold, MAP_GOLD
 
 	jmp .free
 
@@ -319,6 +321,10 @@ draw_cell:
 
 	.apple:
 		DRAW_COLOR_CELL bright_red
+		jmp .exit
+	
+	.gold:
+		DRAW_COLOR_CELL bright_yellow
 		jmp .exit
 
 	.exit:
@@ -484,6 +490,7 @@ update_state:
 	UPDATE_STATE die, MAP_BODY
 	UPDATE_STATE grow, MAP_APPLE
 	UPDATE_STATE free, MAP_FREE
+	UPDATE_STATE gold, MAP_GOLD
 	jmp .exit
 
 	.die:
@@ -504,9 +511,21 @@ update_state:
 		jne .exit
 		mov rax,play
 		mov rdx,argv2
+		call exec		
+		jmp .exit
+	.gold:
+		add qword [score], 10
+		add qword [eaten], 5
+		call place_apple
+		;创建子进程播放1-up音效
+		call fork
+		cmp rax,0
+		jne .exit
+		mov rax,play
+		mov rdx,argv_golden
 		call exec
-		
-		; jmp .exit
+		jmp .exit
+
 	.exit:
 		ret
 ; 函数名：update
@@ -553,7 +572,15 @@ place_apple:
 
 	call rand											; 否则，调用rand函数生成一个随机数 -> rax
 	mov rdx, [map_free_buf+rax*8] ; 将随机选择的空闲单元格的索引存储在rdx中
+	; 有十分之一的概率生成金苹果
+	mov rax, 100
+	call rand
+	cmp rax, 90
+	jg .gold
 	mov byte [map+rdx], MAP_APPLE	; 将地图上该索引位置的单元格标记为苹果
+	jmp .exit
+	.gold:
+	mov byte [map+rdx], MAP_GOLD	; 将地图上该索引位置的单元格标记为金苹果
 
 .exit:
 	ret							

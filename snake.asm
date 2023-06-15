@@ -560,26 +560,33 @@ get_free_cells:
 		jne .loop										; 继续循环
 
 	ret							
+; 函数名：get_apple_index
+; 在空白单元格中随机选择一个单元格，将其索引保存到 rdx 中
+; 返回值：
+; - rdx：苹果的索引
+get_apple_index:
+	call get_free_cells			      ; 调用get_free_cells函数获取空闲单元格
+	mov rax, [map_free_buf_len] 	; 获取空闲单元格的数量				
+
+	call rand											; 调用rand函数生成一个随机数 -> rax
+	mov rdx, [map_free_buf+rax*8] ; 将随机选择的空闲单元格的索引存储在rdx中
+	ret 
 
 ; 函数名：place_apple
 ; 在地图的空白单元格中随机选择一个单元格，将其标记为苹果
 place_apple:
-	call get_free_cells			      ; 调用get_free_cells函数获取空闲单元格
-	mov rax, [map_free_buf_len] 	; 获取空闲单元格的数量
-
-	cmp rax, 0										; 如果空闲单元格的数量为0，则结束
-	je .exit					
-
-	call rand											; 否则，调用rand函数生成一个随机数 -> rax
-	mov rdx, [map_free_buf+rax*8] ; 将随机选择的空闲单元格的索引存储在rdx中
 	; 有十分之一的概率生成金苹果
-	mov rax, 100
+	mov rax, 10
 	call rand
-	cmp rax, 90
-	jg .gold
+	cmp rax, 9
+	
+	jge .gold
+	call get_apple_index		
 	mov byte [map+rdx], MAP_APPLE	; 将地图上该索引位置的单元格标记为苹果
 	jmp .exit
+	
 	.gold:
+	call get_apple_index	
 	mov byte [map+rdx], MAP_GOLD	; 将地图上该索引位置的单元格标记为金苹果
 
 .exit:

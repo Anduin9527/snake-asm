@@ -121,12 +121,18 @@ play  db '/usr/bin/play',0
 arg1  db '-q',0
 music db './res/music.mp3',0
 coin  db './res/coin.mp3',0
+golden_coin db './res/1-up.mp3',0
+power_up db './res/power-up.mp3',0
+power_up_appears db './res/power-up-appears.mp3',0
 arg3  db '-t',0
 arg4  db 'alsa',0
 arg5  db 'repeat',0
 arg6  db '2',0
 argv  dq play,arg1,music,arg3,arg4,arg5,arg6,0
 argv2 dq play,arg1,coin,arg3,arg4,0
+argv_golden dq play,arg1,golden_coin,arg3,arg4,0 
+argv_power_up dq play,arg1,power_up,arg3,arg4,0
+argv_power_up_appears dq play,arg1,power_up_appears,arg3,arg4,0
 child_pid dq 0 ;child process PID
 section .bss
 
@@ -218,11 +224,26 @@ handle_key:
 		; 如果当前游戏状态为加速模式则关闭加速模式
 		cmp byte [is_speed_up], 0
 		je .speed_up
+    ;调用子进程播放音乐
+		call fork  
+		cmp rax,0
+		jne .parent
+		mov rax,play
+		mov rdx,argv_power_up_appears
+		call exec
+
+		.parent:
 		mov byte [is_speed_up], 0
 		jmp .exit
+
 		.speed_up:
 			mov byte [is_speed_up], 1
-		jmp .exit
+			call fork  ;调用子进程播放音乐
+			cmp rax,0
+			jne .exit
+			mov rax,play
+			mov rdx,argv_power_up
+			call exec 
 
 
 
